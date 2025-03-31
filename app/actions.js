@@ -7,7 +7,7 @@ async function processTable(table, data, user) {
     Minor_Version: data.minorVersion,
     Object_Type: data.objectType,
     Object_Name: data.objectType,
-    Parent_ID: data.parentId ? data.parentId : data.defParentId,
+    Parent_ID: data.parentId,
   };
   for (const row of table) {
     objectData.CS1_Name = "HBLT ID";

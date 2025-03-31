@@ -75,10 +75,7 @@ export const CSVUploader = ({ header }) => {
       setError("Please Add Object Type");
       return;
     }
-    if (!document.getElementById("defParentId").value) {
-      setError("Please Add Orcanos Report Id");
-      return;
-    }
+
     setTableData([]);
     let allData = [];
     setLoading({ files: 0, results: 0 });
@@ -236,20 +233,6 @@ export const CSVUploader = ({ header }) => {
               type="text"
               name="objectType"
               id="objectType"
-            />
-          </div>
-          <div className="flex">
-            <label className="font-semibold w-[200px]">
-              Orcanos Report Id :
-            </label>
-
-            <input
-              defaultValue={localStorage.getItem("defParentId")}
-              className="border w-full ml-4 border-gray-400 py-1 px-2 rounded-md"
-              placeholder="Orcanos Report Id"
-              type="number"
-              name="defParentId"
-              id="defParentId"
             />
           </div>
           <button
