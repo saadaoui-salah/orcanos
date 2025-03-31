@@ -104,7 +104,7 @@ export const CSVUploader = ({ header }) => {
                 status: status,
                 startDate: row[9],
                 startTime: row[10],
-                endTime: row[11],
+                endTime: row[12],
                 updatedBy: "",
                 updatedDate: new Date().toISOString().split("T")[0],
                 attachmentsIndicator: "0",
