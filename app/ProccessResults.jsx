@@ -35,6 +35,7 @@ export const CSVUploader = ({ header }) => {
   const [popup, setPopup] = useState(false);
   const [loading, setLoading] = useState({ files: 0, results: 0 });
   const [disableButtoon, setDisableButton] = useState(false);
+  const [reportID, setReportId] = useState(false);
   useEffect(() => {
     setTableData([]);
   }, []);
@@ -260,18 +261,21 @@ export const CSVUploader = ({ header }) => {
           />
         </div>
         <div className="flex flex-col items-start space-y-2">
-          <label className="font-semibold">Step 1 : Orcanos Report ID :</label>
+          <label className="font-semibold">Step 1 : Orcanos Report ID</label>
           <input
             name="parentId"
             id="parentId"
             type="number"
-            maxLength={6}
+            value={reportID}
+            onChange={(e) =>
+              setReportId(e.target.value <= 6 ? e.target.value : reportID)
+            }
             className="border p-2 rounded w-full"
           />
         </div>
 
         <div className="flex flex-col items-start space-y-2">
-          <label className="font-semibold">Step 2 : Upload Files :</label>
+          <label className="font-semibold">Step 2 : Upload Files</label>
           <input
             type="file"
             multiple
@@ -284,9 +288,7 @@ export const CSVUploader = ({ header }) => {
         </div>
 
         <div className="flex flex-col items-start space-y-2">
-          <label className="font-semibold">
-            Step 3 : Set Minimum Pressure :
-          </label>
+          <label className="font-semibold">Step 3 : Set Minimum Pressure</label>
           <input
             type="number"
             name="minPressure"
