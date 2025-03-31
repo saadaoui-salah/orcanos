@@ -37,7 +37,7 @@ export const CSVUploader = ({ header }) => {
   useEffect(() => {
     setTableData([]);
   }, []);
-
+  var index = 1;
   const handleFileUpload = (event) => {
     setFiles([...event.target.files]);
     setLoading({ files: 0, results: 0 });
@@ -94,7 +94,7 @@ export const CSVUploader = ({ header }) => {
               const status = maxPress <= parseFloat(pressure) ? "Pass" : "Fail";
 
               acc.push({
-                key: i,
+                key: index,
                 fileName: file.name,
                 pressureMeasurement: eventPress,
                 pressureMaxMeasurement: row[1] ? row[1] + "" : "N/A",
@@ -106,6 +106,7 @@ export const CSVUploader = ({ header }) => {
                 updatedDate: new Date().toISOString().split("T")[0],
                 attachmentsIndicator: "0",
               });
+              index += 1;
               return acc;
             }, []);
 
