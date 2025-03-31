@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
-import { handleResults } from "./actions";
+import { handleFiles, handleResults } from "./actions";
 
 const Settings = ({ onClick }) => (
   <svg
@@ -26,19 +26,21 @@ const Settings = ({ onClick }) => (
   </svg>
 );
 
-export const CSVUploader = () => {
+export const CSVUploader = ({ header }) => {
   "use client";
   const [files, setFiles] = useState([]);
   const [pressure, setPressure] = useState("");
   const [error, setError] = useState("");
   const [tableData, setTableData] = useState([]);
   const [popup, setPopup] = useState(false);
+  const [loading, setLoading] = useState({ files: 0, results: 0 });
   useEffect(() => {
     setTableData([]);
   }, []);
 
   const handleFileUpload = (event) => {
     setFiles([...event.target.files]);
+    setLoading({ files: 0, results: 0 });
     setTableData([]); //
     setError(""); //
   };
@@ -49,7 +51,6 @@ export const CSVUploader = () => {
       return;
     }
     setError("");
-
     if (files.length === 0) {
       setError("Please upload CSV files before processing.");
       return;
@@ -80,6 +81,7 @@ export const CSVUploader = () => {
     }
     setTableData([]);
     let allData = [];
+    setLoading({ files: 0, results: 0 });
 
     const filePromises = files.map((file) => {
       return new Promise((resolve) => {
@@ -152,10 +154,22 @@ export const CSVUploader = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    formData.set("auth", localStorage.getItem("auth"));
-    formData.set("table", JSON.stringify(tableData));
-    const result = await handleResults(formData);
+    for (const row of tableData) {
+      const formData = new FormData(e.target);
+      formData.set("auth", header);
+      formData.set("table", JSON.stringify([row]));
+      const result = await handleResults(formData);
+      if (result.success)
+        setLoading((st) => ({ ...st, results: st.results + 1 }));
+    }
+    const fData = new FormData(e.target);
+    for (const file of fData.getAll("files")) {
+      fData.set("files", file);
+      fData.set("auth", header);
+      const result = await handleFiles(fData);
+      if (result.success) setLoading((lo) => ({ ...lo, files: lo.files + 1 }));
+    }
+    console.log(loading);
   };
   return (
     <form onSubmit={handleSubmit} encType="multipart/form-data">
@@ -199,7 +213,7 @@ export const CSVUploader = () => {
               defaultValue={localStorage.getItem("majorVersion")}
               id="majorVersion"
             />
-          </div>{" "}
+          </div>
           <div className="flex">
             <label className="font-semibold w-[200px]">Minor Version :</label>
 
@@ -211,7 +225,7 @@ export const CSVUploader = () => {
               id="minorVersion"
               defaultValue={localStorage.getItem("minorVersion")}
             />
-          </div>{" "}
+          </div>
           <div className="flex">
             <label className="font-semibold w-[200px]">Object Type :</label>
 
@@ -302,13 +316,19 @@ export const CSVUploader = () => {
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
 
-        <div className="flex flex-col items-start">
+        <div className="flex items-center gap-x-6">
           <button
+            type="button"
             onClick={handleProcessResults}
             className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
           >
-            Process Results
+            Process Results{" "}
           </button>
+          <p>
+            {loading.results
+              ? `Uploaded ${loading.results}/${tableData.length} result and ${loading.files}/${files.length} file`
+              : ""}
+          </p>
         </div>
 
         <div className="overflow-x-auto mt-6 w-full">
@@ -317,18 +337,13 @@ export const CSVUploader = () => {
               <tr className="bg-gray-200">
                 <th className="border border-gray-300 p-2">Key</th>
                 <th className="border border-gray-300 p-2">File Name</th>
-                <th className="border border-gray-300 p-2">
-                  Press Measurement
-                </th>
+                <th className="border border-gray-300 p-2">Start Date</th>
+                <th className="border border-gray-300 p-2">Start time</th>
+                <th className="border border-gray-300 p-2">End Time</th>
                 <th className="border border-gray-300 p-2">
                   Pressure Max Measurement
                 </th>
                 <th className="border border-gray-300 p-2">Status</th>
-                <th className="border border-gray-300 p-2">Updated By</th>
-                <th className="border border-gray-300 p-2">Updated Date</th>
-                <th className="border border-gray-300 p-2">
-                  Attachments Indicator
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -340,7 +355,13 @@ export const CSVUploader = () => {
                       {row.fileName}
                     </td>
                     <td className="border border-gray-300 p-2">
-                      {row.pressureMeasurement}
+                      {row.startDate}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {row.startTime}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {row.endTime}
                     </td>
                     <td className="border border-gray-300 p-2">
                       {row.pressureMaxMeasurement}
@@ -353,15 +374,6 @@ export const CSVUploader = () => {
                       }`}
                     >
                       {row.status}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {row.updatedBy}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {row.updatedDate}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      {row.attachmentsIndicator}
                     </td>
                   </tr>
                 ))

@@ -10,11 +10,10 @@ async function processTable(table, data, user) {
     Parent_ID: data.parentId ? data.parentId : data.defParentId,
   };
   for (const row of table) {
-    objectData.name = row.key;
     objectData.CS1_Name = "HBLT ID";
     objectData.CS1_value = data.hbltId;
     objectData.CS2_Name = "HBLT File Name";
-    objectData.CS2_value = row.fileName;
+    objectData.CS2_value = row.key;
     objectData.CS3_Name = "Start Run Date";
     objectData.CS3_value = row.startDate;
     objectData.CS4_Name = "Start Run Time";
@@ -39,13 +38,11 @@ async function processTable(table, data, user) {
       );
 
       const result = await response.json();
-      console.log(result);
-
       if (!response.ok) {
         throw new Error(`API request failed: ${response.statusText}`);
       }
     } catch (error) {
-      console.error("Error sending request:", error);
+      throw Error("Not valid Request");
     }
   }
 }
@@ -81,29 +78,37 @@ export async function submitForm(formData) {
   }
 }
 
+export async function handleFiles(formData) {
+  const files = formData.getAll("files");
+  const data = Object.fromEntries(formData);
+  const user = data.orcanosUrl.split("/")[3];
+  const filesFormData = new FormData();
+  filesFormData.set("file", files[0]);
+  const r = await fetch(
+    `https://app.orcanos.com/${user}/api/v2/Json/Add_Attachment?Object_ID=${
+      data.parentId ? data.parentId : data.defParentId
+    }&Object_Type=OBJECT`,
+    {
+      method: "POST",
+      body: filesFormData,
+      headers: {
+        Authorization: data.auth,
+      },
+    }
+  );
+  const rdata = await r.json();
+  if (rdata.HttpCode == 200) return { success: true };
+  else return { success: false };
+}
+
 export async function handleResults(formData) {
   try {
-    const files = formData.getAll("files");
     const data = Object.fromEntries(formData);
     const user = data.orcanosUrl.split("/")[3];
 
     const table = JSON.parse(data.table);
     await processTable(table, data, user);
 
-    const filesFormData = new FormData();
-    filesFormData.set("file", files[0]);
-    const r = await fetch(
-      `https://app.orcanos.com/${user}/api/v2/Json/Add_Attachment?Object_ID=1&Object_Type=DEFECT`,
-      {
-        method: "POST",
-        body: filesFormData,
-        headers: {
-          Authorization: data.auth,
-        },
-      }
-    );
-    const rdata = await r.json();
-    console.log(rdata);
     return { success: true };
   } catch (error) {
     console.error("Error:", error);

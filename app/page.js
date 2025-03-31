@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { submitForm } from "./actions";
 import { CSVUploader } from "./ProccessResults";
+import OrLogo from "./login-page-logo.svg";
+import Image from "next/image";
+
 const LoginForm = ({
   setLoginForm,
   loginForm,
@@ -11,15 +14,11 @@ const LoginForm = ({
 }) => (
   <div
     className="flex justify-center items-center min-h-screen bg-cover bg-center"
-    style={{ backgroundImage: "url('/images/OrcanosBG.png')" }}
+    style={{ backgroundImage: "url('/OrcanosBG.png')" }}
   >
     <div className="p-8 bg-white shadow-md rounded-lg w-[500px] mx-auto">
       <div className="text-center mb-4">
-        <img
-          src="/images/login-page-logo.svg"
-          alt="ORCANOS Logo"
-          className="mx-auto mb-4"
-        />
+        <Image src={OrLogo} alt="ORCANOS Logo" className="mx-auto mb-4" />
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -98,11 +97,6 @@ const LoginForm = ({
 );
 
 const Home = () => {
-  const [page, setPage] = useState(
-    typeof localStorage !== "undefined" && localStorage.getItem("auth")
-      ? "csv"
-      : "login"
-  );
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loginForm, setLoginForm] = useState({});
 
@@ -116,14 +110,17 @@ const Home = () => {
     const result = await submitForm(formData);
     if (result.apiResponse.IsSuccess) {
       const auth = `${loginForm.username}:${loginForm.password}`;
-      localStorage.setItem("auth", `Bearer ${btoa(auth)}`);
-      setPage("csv");
+      setLoginForm({
+        ...loginForm,
+        loggedIn: true,
+        header: `Bearer ${btoa(auth)}`,
+      });
     }
   }
 
   return (
     <>
-      {page === "login" ? (
+      {!loginForm.loggedIn ? (
         <LoginForm
           handleSubmit={handleSubmit}
           setLoginForm={setLoginForm}
@@ -132,7 +129,7 @@ const Home = () => {
           passwordVisible={passwordVisible}
         />
       ) : (
-        <CSVUploader />
+        <CSVUploader header={loginForm.header} />
       )}
     </>
   );
