@@ -268,7 +268,9 @@ export const CSVUploader = ({ header }) => {
             type="number"
             value={reportID}
             onChange={(e) =>
-              setReportId(e.target.value <= 6 ? e.target.value : reportID)
+              setReportId(
+                e.target.value.length <= 6 ? e.target.value : reportID
+              )
             }
             className="border p-2 rounded w-full"
           />
