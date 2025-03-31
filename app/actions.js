@@ -11,9 +11,10 @@ async function processTable(table, data, user) {
   };
   for (const row of table) {
     objectData.CS1_Name = "HBLT ID";
+    objectData.Object_Name = row.key;
     objectData.CS1_value = data.hbltId;
     objectData.CS2_Name = "HBLT File Name";
-    objectData.CS2_value = row.key;
+    objectData.CS2_value = row.fileName;
     objectData.CS3_Name = "Start Run Date";
     objectData.CS3_value = row.startDate;
     objectData.CS4_Name = "Start Run Time";

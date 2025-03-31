@@ -83,7 +83,7 @@ export const CSVUploader = ({ header }) => {
     let allData = [];
     setLoading({ files: 0, results: 0 });
 
-    const filePromises = files.map((file) => {
+    const filePromises = files.map((file, i) => {
       return new Promise((resolve) => {
         Papa.parse(file, {
           complete: (results) => {
@@ -97,7 +97,7 @@ export const CSVUploader = ({ header }) => {
               const status = maxPress <= parseFloat(pressure) ? "Pass" : "Fail";
 
               acc.push({
-                key: row[0],
+                key: i,
                 fileName: file.name,
                 pressureMeasurement: eventPress,
                 pressureMaxMeasurement: row[1] ? row[1] + "" : "N/A",
