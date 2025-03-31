@@ -223,7 +223,9 @@ export const CSVUploader = ({ header }) => {
             />
           </div>
           <div className="flex">
-            <label className="font-semibold w-[200px]">Object Type :</label>
+            <label className="font-semibold w-[200px]">
+              Work item default description :
+            </label>
 
             <input
               defaultValue={localStorage.getItem("objectType")}
