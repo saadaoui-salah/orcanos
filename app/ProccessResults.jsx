@@ -143,10 +143,6 @@ export const CSVUploader = ({ header }) => {
       "objectType",
       document.getElementById("objectType").value
     );
-    localStorage.setItem(
-      "defParentId",
-      document.getElementById("defParentId").value
-    );
     setPopup(false);
   };
   const handleSubmit = async (e) => {

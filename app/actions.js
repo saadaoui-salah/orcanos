@@ -86,9 +86,7 @@ export async function handleFiles(formData) {
   const filesFormData = new FormData();
   filesFormData.set("file", files[0]);
   const r = await fetch(
-    `https://app.orcanos.com/${user}/api/v2/Json/Add_Attachment?Object_ID=${
-      data.parentId ? data.parentId : data.defParentId
-    }&Object_Type=OBJECT`,
+    `https://app.orcanos.com/${user}/api/v2/Json/Add_Attachment?Object_ID=${data.parentId}&Object_Type=OBJECT`,
     {
       method: "POST",
       body: filesFormData,
