@@ -264,7 +264,8 @@ export const CSVUploader = ({ header }) => {
           <input
             name="parentId"
             id="parentId"
-            type="text"
+            type="number"
+            maxLength={6}
             className="border p-2 rounded w-full"
           />
         </div>
