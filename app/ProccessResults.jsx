@@ -34,6 +34,7 @@ export const CSVUploader = ({ header }) => {
   const [tableData, setTableData] = useState([]);
   const [popup, setPopup] = useState(false);
   const [loading, setLoading] = useState({ files: 0, results: 0 });
+  const [disableButtoon, setDisableButton] = useState(false);
   useEffect(() => {
     setTableData([]);
   }, []);
@@ -148,6 +149,7 @@ export const CSVUploader = ({ header }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setDisableButton(true);
     for (const row of tableData) {
       const formData = new FormData(e.target);
       formData.set("auth", header);
@@ -163,7 +165,7 @@ export const CSVUploader = ({ header }) => {
       const result = await handleFiles(fData);
       if (result.success) setLoading((lo) => ({ ...lo, files: lo.files + 1 }));
     }
-    console.log(loading);
+    setDisableButton(false);
   };
   return (
     <form onSubmit={handleSubmit} encType="multipart/form-data">
@@ -369,6 +371,7 @@ export const CSVUploader = ({ header }) => {
         </div>
         <div className="w-full flex items-center justify-end">
           <button
+            disabled={disableButtoon}
             type="submit"
             className="bg-green-500 cursor-pointer text-white py-2 px-4 rounded hover:bg-green-600"
           >
