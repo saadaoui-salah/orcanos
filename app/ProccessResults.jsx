@@ -43,8 +43,8 @@ export const CSVUploader = ({ header }) => {
   const handleFileUpload = (event) => {
     setFiles([...event.target.files]);
     setLoading({ files: 0, results: 0 });
-    setTableData([]); //
-    setError(""); //
+    setTableData([]);
+    setError("");
   };
 
   const handleProcessResults = () => {
@@ -156,6 +156,7 @@ export const CSVUploader = ({ header }) => {
       formData.set("auth", header);
       formData.set("table", JSON.stringify([row]));
       const result = await handleResults(formData);
+      console.log("Row ", result);
       if (result.success)
         setLoading((st) => ({ ...st, results: st.results + 1 }));
     }
@@ -164,6 +165,7 @@ export const CSVUploader = ({ header }) => {
       fData.set("files", file);
       fData.set("auth", header);
       const result = await handleFiles(fData);
+      console.log("File ", result);
       if (result.success) setLoading((lo) => ({ ...lo, files: lo.files + 1 }));
     }
     setDisableButton(false);

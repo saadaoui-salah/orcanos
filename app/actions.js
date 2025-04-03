@@ -1,5 +1,25 @@
 "use server";
 
+async function addRow(data, objectData) {
+  const response = await fetch(
+    `https://app.orcanos.com/${user}/api/v2/Json/QW_Add_Object`,
+    {
+      signal: signal,
+      method: "POST",
+      body: JSON.stringify(objectData),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: data.auth,
+      },
+    }
+  );
+  const result = await response.json();
+  if (!response.ok) {
+    return { status: 500, error: result };
+  }
+  return { status: 200, message: result };
+}
+
 async function processTable(table, data, user) {
   const objectData = {
     Project_ID: data.projectId,
@@ -24,82 +44,36 @@ async function processTable(table, data, user) {
     objectData.CS6_Name = "Max Pressure";
     objectData.CS6_value = row.pressureMaxMeasurement;
     objectData.status = row.status;
-    const controller = new AbortController();
-    const signal = controller.signal;
 
-    // Set a timeout to abort the request
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    try {
-      const response = await fetch(
-        `https://app.orcanos.com/${user}/api/v2/Json/QW_Add_Object`,
-        {
-          signal: signal,
-          method: "POST",
-          body: JSON.stringify(objectData),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: data.auth,
-          },
-        }
-      );
-      clearTimeout(timeoutId);
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.statusText}`);
-      }
-    } catch (error) {
-      setTimeout(() => {
-        console.log("After 2 seconds");
-      }, 2000);
-      const response = await fetch(
-        `https://app.orcanos.com/${user}/api/v2/Json/QW_Add_Object`,
-        {
-          method: "POST",
-          body: JSON.stringify(objectData),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: data.auth,
-          },
-        }
-      );
-
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.statusText}`);
-      }
-    }
+    const results = await addRow(data, objectData);
+    return results;
   }
 }
 
 // Call the function
 
 export async function submitForm(formData) {
-  try {
-    // Convert FormData to JSON
-    const data = Object.fromEntries(formData);
-    const auth = `${data?.Username}:${data?.Password}`;
-    const response = await fetch(
-      "https://app.orcanos.com/orcanosdemo/api/v2/Json/QW_Login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${btoa(auth)}`, // Secure API key
-        },
-        body: JSON.stringify({}),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+  // Convert FormData to JSON
+  const data = Object.fromEntries(formData);
+  const auth = `${data?.Username}:${data?.Password}`;
+  const response = await fetch(
+    "https://app.orcanos.com/orcanosdemo/api/v2/Json/QW_Login",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${btoa(auth)}`, // Secure API key
+      },
+      body: JSON.stringify({}),
     }
+  );
 
-    const result = await response.json();
+  if (!response.ok) {
     return { success: true, apiResponse: result };
-  } catch (error) {
-    console.error("Error:", error);
-    return { success: false, message: error.message };
   }
+
+  const result = await response.json();
+  return { success: true, apiResponse: result };
 }
 
 export async function handleFiles(formData) {
