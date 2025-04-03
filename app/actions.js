@@ -24,8 +24,33 @@ async function processTable(table, data, user) {
     objectData.CS6_Name = "Max Pressure";
     objectData.CS6_value = row.pressureMaxMeasurement;
     objectData.status = row.status;
+    const controller = new AbortController();
+    const signal = controller.signal;
 
+    // Set a timeout to abort the request
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
+      const response = await fetch(
+        `https://app.orcanos.com/${user}/api/v2/Json/QW_Add_Object`,
+        {
+          signal: signal,
+          method: "POST",
+          body: JSON.stringify(objectData),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: data.auth,
+          },
+        }
+      );
+      clearTimeout(timeoutId);
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.statusText}`);
+      }
+    } catch (error) {
+      setTimeout(() => {
+        console.log("After 2 seconds");
+      }, 2000);
       const response = await fetch(
         `https://app.orcanos.com/${user}/api/v2/Json/QW_Add_Object`,
         {
@@ -42,8 +67,6 @@ async function processTable(table, data, user) {
       if (!response.ok) {
         throw new Error(`API request failed: ${response.statusText}`);
       }
-    } catch (error) {
-      throw Error("Not valid Request");
     }
   }
 }
