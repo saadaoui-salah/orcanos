@@ -384,7 +384,7 @@ export const CSVUploader = ({ header }) => {
             type="submit"
             className="bg-green-500 cursor-pointer text-white py-2 px-4 rounded hover:bg-green-600"
           >
-            Uplooad Results
+            Upload Results
           </button>
         </div>
       </div>
