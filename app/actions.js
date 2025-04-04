@@ -45,6 +45,7 @@ async function processTable(table, data, user) {
     objectData.status = row.status;
 
     const results = await addRow(data, objectData, user);
+    console.log(results);
     return results;
   }
 }
@@ -68,7 +69,7 @@ export async function submitForm(formData) {
   );
 
   if (!response.ok) {
-    return { success: true, apiResponse: result };
+    throw Error(result);
   }
 
   const result = await response.json();
@@ -106,7 +107,6 @@ export async function handleResults(formData) {
 
     return { success: true };
   } catch (error) {
-    console.error("Error:", error);
-    return { success: false, message: error.message };
+    throw Error(result);
   }
 }
