@@ -1,6 +1,6 @@
 "use server";
 
-async function addRow(data, objectData) {
+async function addRow(data, objectData, user) {
   const response = await fetch(
     `https://app.orcanos.com/${user}/api/v2/Json/QW_Add_Object`,
     {
@@ -45,7 +45,7 @@ async function processTable(table, data, user) {
     objectData.CS6_value = row.pressureMaxMeasurement;
     objectData.status = row.status;
 
-    const results = await addRow(data, objectData);
+    const results = await addRow(data, objectData, user);
     return results;
   }
 }
