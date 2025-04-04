@@ -4,7 +4,6 @@ async function addRow(data, objectData, user) {
   const response = await fetch(
     `https://app.orcanos.com/${user}/api/v2/Json/QW_Add_Object`,
     {
-      signal: signal,
       method: "POST",
       body: JSON.stringify(objectData),
       headers: {
